@@ -5083,6 +5083,7 @@ export const registerRoutes = async (
     secretScanning: secretScanningService,
     licenseService,
     instanceConfigService,
+    actorContextService: domains.organizations.actorContextService,
     licenseV2: licenseV2Service,
     trustedIp: trustedIpService,
     scim: scimService,

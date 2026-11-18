@@ -2,7 +2,6 @@ import { Knex } from "knex";
 
 import { TDbClient } from "@app/db";
 import { TableName, TAdditionalPrivileges } from "@app/db/schemas";
-import { ActorType } from "@app/lib/auth/actor-types";
 import { DatabaseError } from "@app/lib/errors";
 import { chunkArray } from "@app/lib/fn";
 import { buildFindFilter, ormify, selectAllTableCols, TFindFilter } from "@app/lib/knex";
@@ -103,46 +102,6 @@ export const additionalPrivilegeDALFactory = (db: TDbClient) => {
     return Boolean(result);
   };
 
-  // Without an actor, returns the folder grants of every user and identity in the project.
-  const findFolderScopedPrivileges = async (
-    {
-      projectId,
-      actorId,
-      actorType
-    }: { projectId: string; actorId?: string; actorType?: ActorType.USER | ActorType.IDENTITY },
-    tx?: Knex
-  ) => {
-    const docs = await (tx || db)(TableName.AdditionalPrivilege)
-      .where({ projectId })
-      .whereNotNull("folderId")
-      .where((qb) => {
-        if (actorId) {
-          void qb.where(actorType === ActorType.IDENTITY ? { actorIdentityId: actorId } : { actorUserId: actorId });
-        }
-      })
-      .select(
-        "id",
-        "name",
-        "folderId",
-        "role",
-        "isTemporary",
-        "temporaryAccessEndTime",
-        "actorUserId",
-        "actorIdentityId"
-      );
-
-    return docs as {
-      id: string;
-      name: string;
-      folderId: string;
-      role: string | null;
-      isTemporary: boolean;
-      temporaryAccessEndTime: Date | null;
-      actorUserId: string | null;
-      actorIdentityId: string | null;
-    }[];
-  };
-
   const remapFolderIds = async (pairs: { oldFolderId: string; newFolderId: string }[], tx: Knex) => {
     for (const chunk of chunkArray(pairs, 500)) {
       const values = chunk.map(() => "(?::uuid, ?::uuid)").join(", ");
@@ -200,7 +159,6 @@ export const additionalPrivilegeDALFactory = (db: TDbClient) => {
     delete: deleteFn,
     findWithAccessApprovalStatus,
     isLinkedToAccessApproval,
-    findFolderScopedPrivileges,
     remapFolderIds
   };
 };

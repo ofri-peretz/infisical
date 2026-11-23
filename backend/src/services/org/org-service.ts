@@ -965,7 +965,7 @@ export const orgServiceFactory = ({
           usesNewPrivilegeSystem: shouldUseNewPrivilegeSystem,
           actions: opAction,
           subject: OrgPermissionSubjects.Member,
-          targets: toBoundsTargets(targetPermissions),
+          targets: targetPermissions,
           message: baseMessage
         });
       }
@@ -996,7 +996,7 @@ export const orgServiceFactory = ({
         usesNewPrivilegeSystem: shouldUseNewPrivilegeSystem,
         actions: OrgPermissionMemberActions.GrantPrivileges,
         subject: OrgPermissionSubjects.Member,
-        targets: toBoundsTargets(permissionRoles),
+        targets: permissionRoles,
         message: "Failed to assign the requested role to an org member"
       });
     }
@@ -1359,7 +1359,7 @@ export const orgServiceFactory = ({
       usesNewPrivilegeSystem: shouldUseNewPrivilegeSystem,
       actions: OrgPermissionMemberActions.Delete,
       subject: OrgPermissionSubjects.Member,
-      targets: toBoundsTargets(targetPermissions),
+      targets: targetPermissions,
       message: "Failed to remove this member from the organization"
     });
   };

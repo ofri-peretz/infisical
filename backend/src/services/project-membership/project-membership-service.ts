@@ -8,6 +8,7 @@ import {
   ProjectPermissionSub,
   TProjectPermissionService
 } from "@app/domains/platform/projects/ce/module";
+import { TSecretsPermissionService } from "@app/domains/secrets-manager/secrets/ce/module";
 import { ActorType } from "@app/lib/auth/actor-types";
 import { getConfig } from "@app/lib/config/env";
 import { BadRequestError, NotFoundError } from "@app/lib/errors";
@@ -54,6 +55,7 @@ import {
 
 type TProjectMembershipServiceFactoryDep = {
   projectPermissionService: TProjectPermissionService;
+  secretsPermissionService: TSecretsPermissionService;
   smtpService: TSmtpService;
   projectMembershipDAL: TProjectMembershipDALFactory;
   membershipUserDAL: TMembershipUserDALFactory;
@@ -82,6 +84,7 @@ export type TProjectMembershipServiceFactory = ReturnType<typeof projectMembersh
 
 export const projectMembershipServiceFactory = ({
   projectPermissionService,
+  secretsPermissionService,
   projectMembershipDAL,
   smtpService,
   userGroupMembershipDAL,
@@ -144,7 +147,7 @@ export const projectMembershipServiceFactory = ({
   };
 
   const getProjectMemberships = async ({ actor, includeGroupMembers, projectId, roles }: TGetProjectMembershipDTO) => {
-    const permission = await projectPermissionService.getProjectPermission({ actor, projectId });
+    const permission = await secretsPermissionService.getProjectPermissionWithFolderGrants({ actor, projectId });
     permission.assert({ action: ProjectPermissionMemberActions.Read, subject: ProjectPermissionSub.Member });
 
     const projectMembers = await projectMembershipDAL.findAllProjectMembers(projectId, { roles });
@@ -211,7 +214,7 @@ export const projectMembershipServiceFactory = ({
   };
 
   const getProjectMembershipByUsername = async ({ actor, projectId, username }: TGetProjectMembershipByUsernameDTO) => {
-    const permission = await projectPermissionService.getProjectPermission({ actor, projectId });
+    const permission = await secretsPermissionService.getProjectPermissionWithFolderGrants({ actor, projectId });
     permission.assert({ action: ProjectPermissionMemberActions.Read, subject: ProjectPermissionSub.Member });
 
     const [canonicalUsername] = await $toCanonicalUsernames([username], projectId);
@@ -223,7 +226,7 @@ export const projectMembershipServiceFactory = ({
   };
 
   const addUsersToProject = async ({ projectId, actor, members, sendEmails = true }: TAddUsersToWorkspaceDTO) => {
-    const permission = await projectPermissionService.getProjectPermission({ actor, projectId });
+    const permission = await secretsPermissionService.getProjectPermissionWithFolderGrants({ actor, projectId });
     permission.assert({ action: ProjectPermissionMemberActions.Create, subject: ProjectPermissionSub.Member });
 
     const project = await requestMemoize(requestMemoKeys.projectFindById(projectId), () =>
@@ -349,7 +352,7 @@ export const projectMembershipServiceFactory = ({
     { actor, projectId, emails, usernames }: TDeleteProjectMembershipsDTO,
     externalTx?: Knex
   ) => {
-    const permission = await projectPermissionService.getProjectPermission({ actor, projectId });
+    const permission = await secretsPermissionService.getProjectPermissionWithFolderGrants({ actor, projectId });
     permission.assert({ action: ProjectPermissionMemberActions.Delete, subject: ProjectPermissionSub.Member });
 
     const usernamesAndEmails = await $toCanonicalUsernames([...emails, ...usernames], projectId);

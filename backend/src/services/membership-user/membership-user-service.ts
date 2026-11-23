@@ -13,6 +13,7 @@ import { TInstanceConfigService } from "@app/domains/platform/instance-config-co
 import { Meter, PlanFeature, TLicenseService, TUsageMeteringService } from "@app/domains/platform/license/ce/module";
 import { TOrgPermissionService } from "@app/domains/platform/organizations/ce/module";
 import { TProjectPermissionService } from "@app/domains/platform/projects/ce/module";
+import { TSecretsPermissionService } from "@app/domains/secrets-manager/secrets/ce/module";
 import { TAuditLogServiceFactory } from "@app/ee/services/audit-log/audit-log-types";
 import { TEmailDomainDALFactory } from "@app/ee/services/email-domain/email-domain-dal";
 import { TUserGroupMembershipDALFactory } from "@app/ee/services/group/user-group-membership-dal";
@@ -79,6 +80,7 @@ type TMembershipUserServiceFactoryDep = {
   userDAL: TUserDALFactory;
   orgPermissionService: TOrgPermissionService;
   projectPermissionService: TProjectPermissionService;
+  secretsPermissionService: TSecretsPermissionService;
   licenseService: TLicenseService;
   usageMeteringService: TUsageMeteringService;
   userAliasDAL: TUserAliasDALFactory;
@@ -112,6 +114,7 @@ export const membershipUserServiceFactory = ({
   userDAL,
   orgPermissionService,
   projectPermissionService,
+  secretsPermissionService,
   orgDAL,
   userAliasDAL,
   licenseService,
@@ -151,6 +154,7 @@ export const membershipUserServiceFactory = ({
     [AccessScope.Project]: newProjectMembershipUserFactory({
       orgDAL,
       projectPermissionService,
+      secretsPermissionService,
       membershipUserDAL,
       projectDAL,
       smtpService,

@@ -1182,11 +1182,7 @@ export const projectServiceFactory = ({
   const getAProject = async ({ filter, actor }: TGetProjectDTO) => {
     const project = await projectDAL.findProjectByFilter(filter);
 
-    if (actor.principal.type === ActorType.SERVICE) {
-      await secretsPermissionService.getSecretsPermission({ actor, projectId: project.id });
-    } else {
-      await projectPermissionService.getProjectPermission({ actor, projectId: project.id });
-    }
+    await secretsPermissionService.getProjectPermissionWithFolderGrants({ actor, projectId: project.id });
 
     const deletedEnvironments = await projectDAL.findProjectDeletedEnvironments(project.id);
 

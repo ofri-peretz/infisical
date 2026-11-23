@@ -898,7 +898,6 @@ export const registerRoutes = async (
 
   // Project events SSE service (for clients to subscribe to secret mutation events)
   const projectEventsSSEService = projectEventsSSEServiceFactory({
-    projectPermissionService,
     secretsPermissionService,
     actorContextService,
     projectEventsService,
@@ -946,6 +945,7 @@ export const registerRoutes = async (
   const membershipGroupService = membershipGroupServiceFactory({
     orgPermissionService,
     projectPermissionService,
+    secretsPermissionService,
     actorContextService,
     membershipGroupDAL,
     membershipRoleDAL,
@@ -983,7 +983,7 @@ export const registerRoutes = async (
     licenseService
   });
   const additionalPrivilegeService = additionalPrivilegeServiceFactory({
-    projectPermissionService,
+    secretsPermissionService,
     actorContextService,
     identityDAL,
     additionalPrivilegeDAL,
@@ -1278,6 +1278,7 @@ export const registerRoutes = async (
   const membershipIdentityService = membershipIdentityServiceFactory({
     orgPermissionService,
     projectPermissionService,
+    secretsPermissionService,
     identityDAL,
     identityMetadataDAL,
     identityGroupMembershipDAL,
@@ -1304,6 +1305,7 @@ export const registerRoutes = async (
   const membershipUserService = membershipUserServiceFactory({
     orgPermissionService,
     projectPermissionService,
+    secretsPermissionService,
     orgInviteQuota,
     licenseService,
     instanceConfigService,
@@ -1853,6 +1855,7 @@ export const registerRoutes = async (
 
   const projectMembershipService = projectMembershipServiceFactory({
     projectPermissionService,
+    secretsPermissionService,
     projectMembershipDAL,
     projectDAL,
     userDAL,
@@ -2865,6 +2868,7 @@ export const registerRoutes = async (
   const identityV2Service = identityV2ServiceFactory({
     orgPermissionService,
     projectPermissionService,
+    secretsPermissionService,
     instanceConfigService,
     membershipIdentityDAL,
     membershipRoleDAL,

@@ -11,7 +11,9 @@ What every request and every domain needs about orgs.
 - **Actor context:** `actorContextService.forRequest({ principal, orgId })` builds `req.permission` once per
   request (the org with its root's SSO policy, read through `OrganizationStore.findActorOrg`) and returns any SSO
   refusal for the auth plugin to turn into a 401; `forPrincipal` and `system` build one for queues, crons and
-  consumers. An unscoped request's `org` throws when read.
+  consumers. An unscoped request's `org` throws when read. It builds `TActorContextBase` only: the top level wraps it
+  (`server/lib/actor-context-builder.ts`) to add the audit configuration (`audit`), which needs the plan and projects,
+  so every other caller gets a full `TActorContext` from the wrapper, never from this service.
 - **SSO is a session property, checked once per request, never in a permission service.**
   `ssoSessionService.findSsoSessionRefusal({ principal, org })` applies the root org's `SsoPolicy` and looks the
   bypass up (the user's root org roles) only when the policy refuses. Flows that act on another org than the
